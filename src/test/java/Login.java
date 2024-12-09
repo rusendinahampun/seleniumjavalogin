@@ -15,12 +15,11 @@ import java.util.Date;
 public class Login {
     @Test
     public void open_browser() throws IOException {
-
         WebDriver driver;
         String baseUrl = "https://portal.bisacpns.com/auth/login";
 
+        // Setup WebDriver dan buka browser
         WebDriverManager.chromedriver().setup();
-
         driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.get(baseUrl);
@@ -28,7 +27,7 @@ public class Login {
         // Ambil screenshot setelah membuka URL
         captureScreenshot(driver, "01-website");
 
-        // Get Form
+        // Isi Form Login
         WebElement username = driver.findElement(By.id("email"));
         username.sendKeys("sendinahampun18@gmail.com");
         captureScreenshot(driver, "02-username");
@@ -39,23 +38,20 @@ public class Login {
 
         WebElement buttonMasuk = driver.findElement(By.className("btn-primary"));
         buttonMasuk.click();
-        captureScreenshot(driver, "04-login button");
+        captureScreenshot(driver, "04-post-login");
 
         // Tunggu halaman selesai dimuat
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
 
-        // Ambil screenshot setelah login
-        captureScreenshot(driver, "05-post login");
 
-        // Scroll ke bawah secara bertahap
+        // Scroll ke bawah secara bertahap sambil mengambil screenshot
         scrollAndCapture(driver);
 
         // Tutup browser
         driver.quit();
     }
 
-    // Fungsi untuk mengambil screenshot dengan nama file sesuai step
     private void captureScreenshot(WebDriver driver, String stepName) {
         try {
             File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
@@ -75,24 +71,26 @@ public class Login {
         }
     }
 
-    // Fungsi untuk scroll dan mengambil screenshot hingga ke bagian bawah halaman
     private void scrollAndCapture(WebDriver driver) {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         long lastHeight = (long) js.executeScript("return document.body.scrollHeight");
         int step = 1;
 
         while (true) {
-            // Scroll ke bawah
-            js.executeScript("window.scrollBy(0, 1000);");
+            // Scroll hingga akhir halaman
+            js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+
+            // Tunggu agar halaman selesai di-render
             try {
-                Thread.sleep(1000); // Tunggu agar halaman selesai di-render
+                Thread.sleep(5000); // Sesuaikan durasi
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
             // Ambil screenshot per scroll
             captureScreenshot(driver, "scroll_step_" + step);
-            step++;
+            step++; //Scroll
+
 
             // Cek apakah sudah mencapai bagian bawah halaman
             long newHeight = (long) js.executeScript("return document.body.scrollHeight");
